@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>삼척여자고등학교 1학년 공지·일정</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7fb;--card:#fff;--tx:#1d2433;--sub:#6b7488;--line:#e3e6ee;--pri:#3b6cf6;--sel:#e8eefe;
+--c1:#e5484d;--c2:#3b6cf6;--c3:#eab308;--c4:#16a34a;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1b2030;--tx:#e8ecf5;--sub:#9aa3b8;--line:#2a3144;--pri:#6f93ff;--sel:#242c45;--c1:#ff6b70;--c2:#6f93ff;--c3:#facc15;--c4:#4ade80;color-scheme:dark}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Pretendard","Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.5}
+main{max-width:720px;margin:0 auto;padding:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+h1{font-size:19px;margin:4px 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.nav b{font-size:17px}
+.nav div{display:flex;gap:6px}
+.nb{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:5px 11px}
+.grid{display:grid;grid-template-columns:30px repeat(7,1fr);gap:3px}
+.dow{text-align:center;font-size:12px;color:var(--sub);padding:3px 0}
+.dow:nth-child(2),.c.sun{color:var(--c1)}
+.dow:last-child,.c.sat{color:var(--c2)}
+.w{border:0;background:transparent;color:var(--sub);font-size:11px;border-radius:8px}
+.w.s{background:var(--sel);color:var(--pri);font-weight:700}
+.c{min-height:54px;border:1px solid transparent;background:transparent;border-radius:10px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.c.o{opacity:.38}
+.c.s{background:var(--sel)}
+.c.t{border-color:var(--pri)}
+.c.t .n{font-weight:800;color:var(--pri)}
+.dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center}
+.dt{display:inline-block;width:8px;height:8px;border-radius:50%}
+.t1{background:var(--c1)}.t2{background:var(--c2)}.t3{background:var(--c3)}.t4{background:var(--c4)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-top:8px}
+.legend span{display:flex;align-items:center;gap:4px}
+.dh{margin-bottom:6px}
+.dh h2{font-size:16px;margin:0}
+.it{border-top:1px solid var(--line);padding:10px 0;display:flex;gap:10px}
+.it:first-of-type{border-top:0}
+.bar{width:4px;border-radius:4px;flex:none}
+.it .b{flex:1;min-width:0}
+.meta{font-size:12px;color:var(--sub)}
+.tt{font-weight:700}
+.memo{white-space:pre-wrap;word-break:break-word;margin-top:3px;font-size:14px}
+.empty,.note{color:var(--sub);font-size:14px;padding:8px 0}
+.up{width:100%;text-align:left;border:0;background:transparent;padding:7px 0;border-top:1px solid var(--line);display:flex;gap:8px}
+.up:first-of-type{border-top:0}
+.up .d{color:var(--sub);font-size:13px;min-width:64px}
+</style>
+</head>
+<body>
+<main>
+  <h1>📅 삼척여고 1학년 공지·일정</h1>
+  <div id="status" class="note"></div>
+  <div id="app"></div>
+</main>
+<script>
+/* ▼▼ 공지·일정은 여기만 고치세요 ▼▼
+   한 줄 형식:  ["날짜(YYYY-MM-DD)", "종류(공지/일정/시험/과제)", "제목", "내용"],
+   · 따옴표(")와 줄 끝의 쉼표(,)를 꼭 남겨 두세요.
+   · 일정을 지우려면 그 줄을 통째로 지우세요. */
+const EVENTS = [
+  ["2026-11-13", "공지", "(예시) 한국사 수행평가 실시", "인물 소개문 준비물 챙기기."],
+  ["2026-11-11", "일정", "(예시) 학년 회의", ""],
+];
+/* ▲▲ 여기까지 ▲▲ */
+const TYMAP={'공지':'1','일정':'2','시험':'3','과제':'4'};
+const SAMPLE=EVENTS.map(([date,t,title,memo])=>({date,type:TYMAP[t]||'2',title,memo}));
+const $=s=>document.querySelector(s);
+const TY={1:'공지',2:'일정',3:'시험',4:'과제'};
+const WD=['일','월','화','수','목','금','토'];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const pd=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const fmt=s=>{const d=pd(s);return (d.getMonth()+1)+'월 '+d.getDate()+'일 ('+WD[d.getDay()]+')'};
+const add=(s,n)=>{const d=pd(s);d.setDate(d.getDate()+n);return iso(d)};
+const todayS=iso(new Date());
+let ev=SAMPLE.slice(),sel={m:'day',d:todayS},cur=pd(todayS);cur.setDate(1);
+const byDay=d=>ev.filter(e=>e.date===d);
+const srt=a=>a.slice().sort((x,y)=>x.date<y.date?-1:x.date>y.date?1:0);
+const wk=()=>{const s=add(sel.d,-pd(sel.d).getDay());return[s,add(s,6)]};
+const inSel=d=>sel.m==='day'?d===sel.d:(d>=wk()[0]&&d<=wk()[1]);
+
+function item(e,showDate){
+  return '<div class="it"><div class="bar t'+e.type+'"></div><div class="b"><div class="meta">'+TY[e.type]+(showDate?' · '+fmt(e.date):'')+'</div><div class="tt">'+esc(e.title)+'</div>'+(e.memo?'<div class="memo">'+esc(e.memo)+'</div>':'')+'</div></div>';
+}
+function render(){
+  const y=cur.getFullYear(),m=cur.getMonth(),first=cur.getDay(),dim=new Date(y,m+1,0).getDate(),rows=Math.ceil((first+dim)/7);
+  let g='<div class="grid"><div></div>'+WD.map(w=>'<div class="dow">'+w+'</div>').join('');
+  const start=add(iso(cur),-first);
+  for(let r=0;r<rows;r++){
+    const ws=add(start,r*7),wsel=sel.m==='week'&&wk()[0]===ws;
+    g+='<button class="w'+(wsel?' s':'')+'" data-w="'+ws+'" aria-label="이 주 보기">주</button>';
+    for(let i=0;i<7;i++){
+      const d=add(ws,i),dd=pd(d),es=byDay(d);
+      g+='<button class="c'+(dd.getMonth()!==m?' o':'')+(d===todayS?' t':'')+(inSel(d)?' s':'')+(i===0?' sun':'')+(i===6?' sat':'')+'" data-d="'+d+'"><span class="n">'+dd.getDate()+'</span><span class="dots">'+es.slice(0,4).map(e=>'<i class="dt t'+e.type+'"></i>').join('')+'</span></button>';
+    }
+  }
+  g+='</div><div class="legend">'+Object.keys(TY).map(k=>'<span><i class="dt t'+k+'"></i>'+TY[k]+'</span>').join('')+'</div>';
+  let list,title;
+  if(sel.m==='day'){title=fmt(sel.d);list=srt(byDay(sel.d))}
+  else{const[a,b]=wk();title=fmt(a)+' – '+fmt(b);list=srt(ev.filter(e=>e.date>=a&&e.date<=b))}
+  const up=srt(ev.filter(e=>e.date>=todayS)).slice(0,5);
+  $('#app').innerHTML=
+  '<div class="card"><div class="nav"><b>'+y+'년 '+(m+1)+'월</b><div><button class="nb" data-nav="-1">‹</button><button class="nb" data-nav="0">오늘</button><button class="nb" data-nav="1">›</button></div></div>'+g+'</div>'+
+  '<div class="card"><div class="dh"><h2>'+(sel.m==='week'?'주간 · ':'')+title+'</h2></div>'+
+  (list.length?list.map(e=>item(e,sel.m==='week')).join(''):'<div class="empty">등록된 공지·일정이 없어요.</div>')+'</div>'+
+  '<div class="card"><div class="dh"><h2>다가오는 일정</h2></div>'+
+  (up.length?up.map(e=>'<button class="up" data-d="'+e.date+'"><span class="d">'+fmt(e.date).replace(/ \(.\)/,'')+'</span><span><i class="dt t'+e.type+'"></i> '+esc(e.title)+'</span></button>').join(''):'<div class="empty">다가오는 일정이 없어요.</div>')+'</div>';
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  const d=t.dataset;
+  if(d.d){sel={m:'day',d:d.d};const n=pd(d.d);cur=new Date(n.getFullYear(),n.getMonth(),1);render()}
+  else if(d.w){sel={m:'week',d:d.w};render()}
+  else if(d.nav!==undefined){if(d.nav==='0'){sel={m:'day',d:todayS};cur=pd(todayS);cur.setDate(1)}else cur=new Date(cur.getFullYear(),cur.getMonth()+Number(d.nav),1);render()}
+});
+
+render();
+</script>
+</body>
+</html>
